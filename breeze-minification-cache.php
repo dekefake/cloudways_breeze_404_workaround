@@ -344,7 +344,10 @@ class Breeze_MinificationCache {
 								'.',
 								'..'
 							) ) && ( strpos( $file, 'lock' ) !== false || strpos( $file, BREEZE_CACHEFILE_PREFIX ) !== false ) && is_file( $thisAoCacheDir . $file ) ) {
-							@unlink( $thisAoCacheDir . $file );
+							// Only delete file if its more than 2 days old.
+							if( time() - filemtime( $thisAoCacheDir . $file ) > 86400*2 ) {
+								@unlink( $thisAoCacheDir . $file );
+							}
 						}
 					}
 				}
