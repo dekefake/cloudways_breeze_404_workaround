@@ -334,6 +334,11 @@ class Breeze_MinificationCache {
 				}
 			}
 
+			// Only delete CSS files if they're more than 14 days old.
+			// Only delete other files (supposed to be JS) if they're more than 4 days old.
+			$default_min_lifespan = 4;
+			$css_min_lifespan = 14;
+
 			// clear the cachedirs
 			foreach ( $cache_folders as $user_folder ) {
 				foreach ( $scan as $scandirName => $scanneddir ) {
@@ -344,8 +349,13 @@ class Breeze_MinificationCache {
 								'.',
 								'..'
 							) ) && ( strpos( $file, 'lock' ) !== false || strpos( $file, BREEZE_CACHEFILE_PREFIX ) !== false ) && is_file( $thisAoCacheDir . $file ) ) {
-							// Only delete file if its more than 2 days old.
-							if( time() - filemtime( $thisAoCacheDir . $file ) > 86400*2 ) {
+
+							$file_lifespan = $default_min_lifespan;
+							if (str_ends_with($file, 'css')) {
+							    $file_lifespan = $css_min_lifespan;
+							}
+							
+							if( time() - filemtime( $thisAoCacheDir . $file ) > 86400 * $file_lifespan ) {
 								@unlink( $thisAoCacheDir . $file );
 							}
 						}
