@@ -11,8 +11,10 @@ class Breeze_MinificationCache {
 	private $mime;
 	private $cachedir;
 	private $delayed;
+	private $nogzip;
 
 	public function __construct( $md5, $ext = 'php' ) {
+		$separate_cache = breeze_mobile_detect();
 		$this->cachedir = BREEZE_MINIFICATION_CACHE . breeze_current_user_type();
 		if ( is_multisite() ) {
 			$blog_id        = get_current_blog_id();
@@ -22,12 +24,12 @@ class Breeze_MinificationCache {
 		$this->delayed = BREEZE_CACHE_DELAY;
 		$this->nogzip  = BREEZE_CACHE_NOGZIP;
 		if ( $this->nogzip == false ) {
-			$this->filename = BREEZE_CACHEFILE_PREFIX . $md5 . '.php';
+			$this->filename = BREEZE_CACHEFILE_PREFIX . $separate_cache . $md5 . '.php';
 		} else {
 			if ( in_array( $ext, array( 'js', 'css' ) ) ) {
-				$this->filename = $ext . '/' . BREEZE_CACHEFILE_PREFIX . $md5 . breeze_currency_switcher_cache() . '.' . $ext;
+				$this->filename = $ext . '/' . BREEZE_CACHEFILE_PREFIX . $separate_cache . $md5 . breeze_currency_switcher_cache() . '.' . $ext;
 			} else {
-				$this->filename = '/' . BREEZE_CACHEFILE_PREFIX . $md5 . '.' . $ext;
+				$this->filename = '/' . BREEZE_CACHEFILE_PREFIX . $separate_cache . $md5 . '.' . $ext;
 			}
 		}
 
@@ -333,6 +335,7 @@ class Breeze_MinificationCache {
 					}
 				}
 			}
+			
 			// Only delete CSS files if they're more than 14 days old.
 			// Only delete other files (supposed to be JS) if they're more than 4 days old.
 			$default_min_lifespan = 4;
